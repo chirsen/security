@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>camera</title>
+</head>
+
+<body>
+    <video id="video" width="320px" height="240px" autoplay=""></video>
+    <canvas id="cvs" width="160px" height="120px" style="background-color:#eee"></canvas>
+    <script>
+    // 一个调用摄像头进行防盗的页面
+    var vedio = document.getElementById('video');
+    var cvs = document.getElementById("cvs");
+    var ctx = cvs.getContext("2d");
+    var pre, current;
+    var preScore = 0, currentScore;
+
+    navigator.webkitGetUserMedia({
+        video: true
+    }, success, error);
+
+
+    function success(stream) {
+        vedio.src = window.webkitURL.createObjectURL(stream);
+        vedio.play();
+
+        function handler() {
+            ctx.drawImage(video, 0, 0, 160, 120);
+            var myImageData = ctx.getImageData(0, 0, 160, 120);
+            var cvsTemp = cvs;
+            var data = myImageData.data;
+            var len = data.length;
+            var count = 0;
+            var i;
+            if (pre) {
+            	current = getGrey(data);
+                for (i = 0; i<len;i++) {
+                    if (pre[i] != current[i]) {
+                        count++;
+                    }
+                }
+                pre = current;
+            }else{
+            	pre = getGrey(data);
+            }
+            currentScore = count/len;
+            if(Math.abs(currentScore - preScore) >= 0.02){
+                /*canvas 转换为base64，并且上传服务器*/
+                var base64 = cvs.toDataURL();
+                var img = document.createElement("img");
+                img.style.display = "none";
+                document.getElementsByTagName("body")[0].appendChild(img);
+                img.src = "url("+base64+")";
+                document.getElementsByTagName("body")[0].removeChild(img);
+            }
+            preScore = currentScore;
+            setTimeout(function() {
+                handler();
+            }, 5000);
+        }
+
+        setTimeout(function() {
+            handler();
+        }, 5000);
+    }
+
+    function error(err) {
+        alert("vedio error" + err);
+    }
+
+    function getGrey(data){
+    	for(var i = 0, len = data.length; i < len; i+=4){
+    		var avg = (data[i] + data[i+1] + data[i+2])/3;
+    		data[i] = avg;
+    		data[i+1] = avg;
+    		data[i+2] = avg;
+    	}
+    	return data;
+    }
+    </script>
+</body>
+
+</html>

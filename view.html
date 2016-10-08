@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>view my changes</title>
+</head>
+<body>
+	<img id="img" width="320px" height="240px" alt="">
+	<span id="date"></span>
+	<script src="http://libs.baidu.com/jquery/1.11.3/jquery.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			var img = $("#img");
+			$.ajax({
+				url:"http://127.0.0.1:8080/viewData",
+				success:function(result, status){
+					img.attr("src", result.replace("/)$/g", ""));
+				}
+			});
+		});
+	</script>
+</body>
+</html>
