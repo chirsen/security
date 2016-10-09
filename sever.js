@@ -11,7 +11,7 @@ var mailConfige = {
     // port for secure SMTP
     auth: {
         user: 'chirsen@163.com',
-        pass: 'wqs54573'
+        pass: 'pass'
     }
 };
 
